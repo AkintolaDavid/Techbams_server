@@ -35,5 +35,17 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Error fetching courses" });
   }
 });
-
+router.get("/:id", async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    const course = await Course.findById(courseId); // Assuming your course data is in the "Course" model
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+    res.json(course);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 module.exports = router;
