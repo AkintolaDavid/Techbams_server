@@ -27,5 +27,13 @@ router.post("/addCourse", async (req, res) => {
     res.status(500).json({ message: "Error adding course" });
   }
 });
+router.get("/", async (req, res) => {
+  try {
+    const courses = await Course.find(); // Fetch courses from MongoDB
+    res.json(courses);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching courses" });
+  }
+});
 
 module.exports = router;
