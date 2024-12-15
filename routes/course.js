@@ -2,7 +2,27 @@
 const express = require("express");
 const router = express.Router();
 const Course = require("../models/Course"); // Import your Course model
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "courses", // Folder name in Cloudinary
+    allowed_formats: ["jpg", "png", "jpeg"], // Allowed file types
+  },
+});
+const upload = multer({ storage });
+
+router.post("/upload", upload.single("image"), (req, res) => {
+  try {
+    res.status(200).json({ imageUrl: req.file.path }); // Cloudinary URL
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Image upload failed" });
+  }
+});
 // POST route to save a course
 router.post("/addCourse", async (req, res) => {
   try {
