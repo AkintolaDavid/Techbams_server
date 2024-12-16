@@ -10,7 +10,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "courses", // Folder name in Cloudinary
-    allowed_formats: ["jpg", "png", "jpeg"], // Allowed file types
+    allowed_formats: ["jpg", "png", "jpeg", "pdf", "docx", "pptx"], // Allowed file types
   },
 });
 const upload = multer({ storage });
