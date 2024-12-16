@@ -109,7 +109,7 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-router.get("/courses", async (req, res) => {
+router.get("/displaycourses", async (req, res) => {
   const { title } = req.query;
   try {
     const courses = title
