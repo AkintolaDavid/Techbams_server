@@ -100,10 +100,7 @@ router.get("/displaycourses", async (req, res) => {
   const { title } = req.query;
   try {
     const courses = title
-      ? await db
-          .collection("courses")
-          .find({ title: { $regex: title, $options: "i" } })
-          .toArray()
+      ? await Course.find({ title: { $regex: title, $options: "i" } }).toArray()
       : await db.collection("courses").find().toArray();
     res.json(courses);
   } catch (error) {
