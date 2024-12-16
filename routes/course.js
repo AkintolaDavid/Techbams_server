@@ -96,17 +96,7 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Error fetching courses" });
   }
 });
-router.get("/displaycourses", async (req, res) => {
-  const { title } = req.query;
-  try {
-    const courses = title
-      ? await Course.find({ title: { $regex: title, $options: "i" } }).toArray()
-      : await db.collection("courses").find().toArray();
-    res.json(courses);
-  } catch (error) {
-    res.status(500).json({ error: "Error fetching courses" });
-  }
-});
+
 router.get("/:id", async (req, res) => {
   try {
     const courseId = req.params.id;
@@ -122,15 +112,11 @@ router.get("/:id", async (req, res) => {
 });
 
 // Delete a course by ID
-router.delete("/deletecourses/adminpage/:id", async (req, res) => {
-  const { id } = req.params;
+router.delete("/deletecourses/adminpage/:pid", async (req, res) => {
+  const { pid } = req.params;
   try {
-    const result = await Course.deleteOne({ _id: new ObjectId(id) });
-    if (result.deletedCount === 1) {
-      res.json({ message: "Course deleted successfully" });
-    } else {
-      res.status(404).json({ error: "Course not found" });
-    }
+    await Product.findByIdAndDelete(pid);
+    res.status(200).json({ message: "Product deleted successfully!" });
   } catch (error) {
     res.status(500).json({ error: "Error deleting course" });
   }
