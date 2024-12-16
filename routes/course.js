@@ -112,7 +112,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Delete a course by ID
-router.delete("/deletecourses/adminpage/:pid", async (req, res) => {
+router.delete("/:pid", async (req, res) => {
   const { pid } = req.params;
   try {
     await Product.findByIdAndDelete(pid);
