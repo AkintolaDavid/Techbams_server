@@ -12,20 +12,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware to parse JSON requests
-app.use(express.json());
+// CORS options to allow multiple origins (local dev + production URL)
 const corsOptions = {
   origin: ["http://localhost:5173", "https://techbams.vercel.app"], // Replace with your frontend URL in production
   methods: "GET,POST,PUT,DELETE,PATCH",
   allowedHeaders: "Content-Type,Authorization,multipart/form-data",
 };
 
+// Apply CORS middleware before other routes
 app.use(cors(corsOptions));
+
+// Middleware to parse JSON requests
+app.use(express.json());
 connectDB(); // Using the `connectDB` function from db.js
 
 // Routes
 app.use("/api/auth", authRoutes); // Authentication routes
 app.use("/api/courses", courseRoutes);
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
