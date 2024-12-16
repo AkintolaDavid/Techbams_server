@@ -125,7 +125,7 @@ router.get("/displaycourses", async (req, res) => {
 });
 
 // Delete a course by ID
-router.delete("/courses/:id", async (req, res) => {
+router.delete("/displaycourses/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await db
