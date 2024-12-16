@@ -109,4 +109,35 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+router.get("/courses", async (req, res) => {
+  const { title } = req.query;
+  try {
+    const courses = title
+      ? await db
+          .collection("courses")
+          .find({ title: { $regex: title, $options: "i" } })
+          .toArray()
+      : await db.collection("courses").find().toArray();
+    res.json(courses);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching courses" });
+  }
+});
+
+// Delete a course by ID
+router.delete("/courses/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await db
+      .collection("courses")
+      .deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 1) {
+      res.json({ message: "Course deleted successfully" });
+    } else {
+      res.status(404).json({ error: "Course not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Error deleting course" });
+  }
+});
 module.exports = router;
