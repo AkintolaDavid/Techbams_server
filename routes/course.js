@@ -26,12 +26,13 @@ const videoStorage = new CloudinaryStorage({
 const videoUpload = multer({ storage: videoStorage });
 router.post("/uploadResource", upload.single("resource"), (req, res) => {
   try {
-    const fileUrl = `/uploads/resources/${req.file.filename}`;
+    const fileUrl = req.file.path; // Cloudinary file URL
     res.status(200).json({ fileUrl });
   } catch (err) {
     res.status(500).json({ message: "File upload failed", error: err });
   }
 });
+
 router.post("/uploadVideo", videoUpload.single("video"), (req, res) => {
   try {
     res.status(200).json({ videoUrl: req.file.path }); // Cloudinary video URL
