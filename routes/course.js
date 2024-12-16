@@ -24,10 +24,39 @@ const videoStorage = new CloudinaryStorage({
   },
 });
 const videoUpload = multer({ storage: videoStorage });
-router.post("/uploadResource", upload.single("resource"), (req, res) => {
+router.post("/uploadResource", async (req, res) => {
   try {
-    const fileUrl = req.file.path; // Cloudinary file URL
-    res.status(200).json({ fileUrl });
+    // Extract base64 file data from the request body
+    const { fileData } = req.body;
+
+    if (!fileData) {
+      return res.status(400).json({ message: "No file data provided." });
+    }
+
+    // Decode the base64 file data
+    const buffer = Buffer.from(fileData, "base64");
+
+    // Upload the file to Cloudinary
+    const cloudinaryResponse = await cloudinary.uploader.upload_stream(
+      {
+        folder: "courses", // Cloudinary folder
+        allowed_formats: ["jpg", "png", "jpeg", "pdf", "docx", "pptx"], // Allowed formats
+      },
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          return res
+            .status(500)
+            .json({ message: "Error uploading file to Cloudinary", error });
+        }
+
+        // Send back the Cloudinary file URL
+        res.status(200).json({ fileUrl: result.secure_url });
+      }
+    );
+
+    // Stream the file data to Cloudinary
+    cloudinaryResponse.end(buffer);
   } catch (err) {
     console.error("Error during file upload:", err);
     res.status(500).json({ message: "File upload failed", error: err });
