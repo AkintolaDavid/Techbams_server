@@ -112,13 +112,24 @@ router.get("/:id", async (req, res) => {
 });
 
 // Delete a course by ID
-router.delete("/:pid", async (req, res) => {
-  const { pid } = req.params;
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params; // Use 'id' as the parameter in the route
   try {
-    await Product.findByIdAndDelete(pid);
-    res.status(200).json({ message: "Product deleted successfully!" });
+    // Find and delete the course by its ID
+    const deletedCourse = await Course.findByIdAndDelete(id);
+
+    // If no course is found, return a 404 error
+    if (!deletedCourse) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Return a success message if the course was deleted
+    res.status(200).json({ message: "Course deleted successfully!" });
   } catch (error) {
+    console.error("Error deleting course:", error);
+    // Return a 500 error if something goes wrong on the server
     res.status(500).json({ error: "Error deleting course" });
   }
 });
+
 module.exports = router;
