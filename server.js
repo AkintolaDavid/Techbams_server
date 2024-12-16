@@ -17,7 +17,7 @@ app.use(express.json());
 const corsOptions = {
   origin: ["http://localhost:5173", "https://techbams.vercel.app"], // Replace with your frontend URL in production
   methods: "GET,POST,PUT,DELETE,PATCH",
-  allowedHeaders: "Content-Type,Authorization",
+  allowedHeaders: "Content-Type,Authorization,multipart/form-data",
 };
 
 app.use(cors(corsOptions));
