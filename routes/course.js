@@ -29,6 +29,7 @@ router.post("/uploadResource", upload.single("resource"), (req, res) => {
     const fileUrl = req.file.path; // Cloudinary file URL
     res.status(200).json({ fileUrl });
   } catch (err) {
+    console.error("Error during file upload:", err);
     res.status(500).json({ message: "File upload failed", error: err });
   }
 });
@@ -54,6 +55,14 @@ router.post("/addCourse", async (req, res) => {
   try {
     const { title, description, rating, lecturer, img, category, sections } =
       req.body;
+
+    // Validate required fields
+    if (!title || !description || !rating) {
+      return res
+        .status(400)
+        .json({ message: "Title, description, and rating are required." });
+    }
+
     const newCourse = new Course({
       title,
       description,
@@ -70,9 +79,12 @@ router.post("/addCourse", async (req, res) => {
       .json({ message: "Course added successfully", course: newCourse });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error adding course" });
+    res
+      .status(500)
+      .json({ message: "Error adding course. Please try again later." });
   }
 });
+
 router.get("/", async (req, res) => {
   try {
     const courses = await Course.find(); // Fetch courses from MongoDB
