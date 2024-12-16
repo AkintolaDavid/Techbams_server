@@ -122,12 +122,10 @@ router.get("/:id", async (req, res) => {
 });
 
 // Delete a course by ID
-router.delete("/deletecourses/:id", async (req, res) => {
+router.delete("/deletecourses/adminpage/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await db
-      .collection("courses")
-      .deleteOne({ _id: new ObjectId(id) });
+    const result = await Course.deleteOne({ _id: new ObjectId(id) });
     if (result.deletedCount === 1) {
       res.json({ message: "Course deleted successfully" });
     } else {
