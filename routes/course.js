@@ -6,15 +6,6 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "courses", // Folder name in Cloudinary
-    allowed_formats: ["jpg", "png", "jpeg", "pdf", "docx", "pptx"], // Allowed file types
-  },
-});
-const upload = multer({ storage });
-
 const videoStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -24,45 +15,28 @@ const videoStorage = new CloudinaryStorage({
   },
 });
 const videoUpload = multer({ storage: videoStorage });
-router.post("/uploadResource", async (req, res) => {
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/resources"); // The folder where files will be stored
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Set file name with timestamp to avoid duplicates
+  },
+});
+
+const upload = multer({ storage });
+
+router.post("/uploadResource", upload.single("resource"), (req, res) => {
   try {
-    // Extract base64 file data from the request body
-    const { fileData } = req.body;
+    // File path on the server
+    const fileUrl = `/uploads/resources/${req.file.filename}`;
 
-    if (!fileData) {
-      return res.status(400).json({ message: "No file data provided." });
-    }
-
-    // Decode the base64 file data
-    const buffer = Buffer.from(fileData, "base64");
-
-    // Upload the file to Cloudinary
-    const cloudinaryResponse = await cloudinary.uploader.upload_stream(
-      {
-        folder: "courses", // Cloudinary folder
-        allowed_formats: ["jpg", "png", "jpeg", "pdf", "docx", "pptx"], // Allowed formats
-      },
-      (error, result) => {
-        if (error) {
-          console.error("Cloudinary upload error:", error);
-          return res
-            .status(500)
-            .json({ message: "Error uploading file to Cloudinary", error });
-        }
-
-        // Send back the Cloudinary file URL
-        res.status(200).json({ fileUrl: result.secure_url });
-      }
-    );
-
-    // Stream the file data to Cloudinary
-    cloudinaryResponse.end(buffer);
+    res.status(200).json({ fileUrl });
   } catch (err) {
     console.error("Error during file upload:", err);
     res.status(500).json({ message: "File upload failed", error: err });
   }
 });
-
 router.post("/uploadVideo", videoUpload.single("video"), (req, res) => {
   try {
     res.status(200).json({ videoUrl: req.file.path }); // Cloudinary video URL
