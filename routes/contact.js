@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
 const Contact = require("../models/Contact");
-const verifyTokenForAdminOrUser = require("../middleware/verifyTokenForAdminOrUser");
+const verifyAdminToken = require("../middleware/verifyAdminToken ");
 const sendOwnerMail = async (name, email, number, message) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -22,7 +22,7 @@ const sendOwnerMail = async (name, email, number, message) => {
   await transporter.sendMail(mailOptions);
 };
 
-router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
+router.get("/", verifyAdminToken, async (req, res) => {
   try {
     const contacts = await Contact.find();
     res.status(200).json(contacts);
@@ -31,7 +31,7 @@ router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
   }
 });
 
-router.post("/", verifyTokenForAdminOrUser, async (req, res) => {
+router.post("/", async (req, res) => {
   const { name, email, number, message } = req.body;
 
   if (!name || !email || !number || !message) {
