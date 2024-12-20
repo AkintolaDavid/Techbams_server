@@ -70,7 +70,7 @@ router.post("/verify-otp", async (req, res) => {
     };
 
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token valid for 1 hour
+      expiresIn: "2h", // Token valid for 1 hour
     });
 
     // Delete OTP after successful verification
