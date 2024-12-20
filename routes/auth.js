@@ -132,7 +132,7 @@ router.post("/login", async (req, res) => {
         id: user._id,
         email: user.email,
         fullName: user.fullName,
-        role: tokenPayload.role,
+        role: "user",
       },
     });
   } catch (error) {
