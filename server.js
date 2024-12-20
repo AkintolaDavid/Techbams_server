@@ -3,7 +3,9 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/auth");
 const courseRoutes = require("./routes/course");
-
+const contactRoutes = require("./routes/contact");
+const userRoutes = require("./routes/user");
+const adminRoutes = require("./routes/adminRoutes");
 const cors = require("cors");
 // Load environment variables from .env
 dotenv.config();
@@ -29,7 +31,9 @@ connectDB(); // Using the `connectDB` function from db.js
 // Routes
 app.use("/api/auth", authRoutes); // Authentication routes
 app.use("/api/courses", courseRoutes);
-
+app.use("/api/contact", contactRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

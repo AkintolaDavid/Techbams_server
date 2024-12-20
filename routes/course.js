@@ -5,7 +5,8 @@ const Course = require("../models/Course"); // Import your Course model
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
-
+const verifyAdminToken = require("../middleware/verifyAdminToken ");
+const verifyTokenForAdminOrUser = require("../middleware/verifyTokenForAdminOrUser");
 const videoStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -26,26 +27,36 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.post("/uploadResource", upload.single("resource"), (req, res) => {
-  try {
-    // File path on the server
-    const fileUrl = `/uploads/resources/${req.file.filename}`;
+router.post(
+  "/uploadResource",
+  verifyAdminToken,
+  upload.single("resource"),
+  (req, res) => {
+    try {
+      // File path on the server
+      const fileUrl = `/uploads/resources/${req.file.filename}`;
 
-    res.status(200).json({ fileUrl });
-  } catch (err) {
-    console.error("Error during file upload:", err);
-    res.status(500).json({ message: "File upload failed", error: err });
+      res.status(200).json({ fileUrl });
+    } catch (err) {
+      console.error("Error during file upload:", err);
+      res.status(500).json({ message: "File upload failed", error: err });
+    }
   }
-});
-router.post("/uploadVideo", videoUpload.single("video"), (req, res) => {
-  try {
-    res.status(200).json({ videoUrl: req.file.path }); // Cloudinary video URL
-  } catch (error) {
-    console.error("Error uploading video:", error);
-    res.status(500).json({ message: "Video upload failed" });
+);
+router.post(
+  "/uploadVideo",
+  verifyAdminToken,
+  videoUpload.single("video"),
+  (req, res) => {
+    try {
+      res.status(200).json({ videoUrl: req.file.path }); // Cloudinary video URL
+    } catch (error) {
+      console.error("Error uploading video:", error);
+      res.status(500).json({ message: "Video upload failed" });
+    }
   }
-});
-router.post("/upload", upload.single("image"), (req, res) => {
+);
+router.post("/upload", verifyAdminToken, upload.single("image"), (req, res) => {
   try {
     res.status(200).json({ imageUrl: req.file.path }); // Cloudinary URL
   } catch (error) {
@@ -54,7 +65,7 @@ router.post("/upload", upload.single("image"), (req, res) => {
   }
 });
 // POST route to save a course
-router.post("/addCourse", async (req, res) => {
+router.post("/addCourse", verifyAdminToken, async (req, res) => {
   try {
     const { title, description, rating, lecturer, img, category, sections } =
       req.body;
@@ -88,7 +99,7 @@ router.post("/addCourse", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
   try {
     const courses = await Course.find(); // Fetch courses from MongoDB
     res.json(courses);
@@ -97,7 +108,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", verifyTokenForAdminOrUser, async (req, res) => {
   try {
     const courseId = req.params.id;
     const course = await Course.findById(courseId); // Assuming your course data is in the "Course" model
@@ -112,7 +123,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Delete a course by ID
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verifyAdminToken, async (req, res) => {
   const { id } = req.params; // Use 'id' as the parameter in the route
   try {
     // Find and delete the course by its ID
