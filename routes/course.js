@@ -25,45 +25,6 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
-
-router.post(
-  "/uploadResource",
-  verifyAdminToken,
-  upload.single("resource"),
-  (req, res) => {
-    try {
-      // File path on the server
-      const fileUrl = `/uploads/resources/${req.file.filename}`;
-
-      res.status(200).json({ fileUrl });
-    } catch (err) {
-      console.error("Error during file upload:", err);
-      res.status(500).json({ message: "File upload failed", error: err });
-    }
-  }
-);
-router.post(
-  "/uploadVideo",
-  verifyAdminToken,
-  videoUpload.single("video"),
-  (req, res) => {
-    try {
-      res.status(200).json({ videoUrl: req.file.path }); // Cloudinary video URL
-    } catch (error) {
-      console.error("Error uploading video:", error);
-      res.status(500).json({ message: "Video upload failed" });
-    }
-  }
-);
-router.post("/upload", verifyAdminToken, upload.single("image"), (req, res) => {
-  try {
-    res.status(200).json({ imageUrl: req.file.path }); // Cloudinary URL
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Image upload failed" });
-  }
-});
 // POST route to save a course
 router.post("/addCourse", verifyAdminToken, async (req, res) => {
   try {
