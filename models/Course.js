@@ -27,6 +27,7 @@ const courseSchema = new mongoose.Schema({
   img: String,
   category: String,
   sections: [sectionSchema],
+  whatYouWillLearn: [String],
 });
 
 const Course = mongoose.model("Course", courseSchema);

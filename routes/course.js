@@ -103,5 +103,19 @@ router.delete("/:id", verifyAdminToken, async (req, res) => {
     res.status(500).json({ error: "Error deleting course" });
   }
 });
+router.put("/course/:id/learn", async (req, res) => {
+  const { id } = req.params;
+  const { whatYouWillLearn } = req.body;
 
+  try {
+    const course = await Course.findByIdAndUpdate(
+      id,
+      { whatYouWillLearn },
+      { new: true }
+    );
+    res.status(200).json({ message: "Updated successfully", course });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update", error });
+  }
+});
 module.exports = router;
