@@ -28,8 +28,16 @@ const storage = multer.diskStorage({
 // POST route to save a course
 router.post("/addCourse", verifyAdminToken, async (req, res) => {
   try {
-    const { title, description, rating, lecturer, img, category, sections } =
-      req.body;
+    const {
+      title,
+      description,
+      rating,
+      lecturer,
+      img,
+      category,
+      sections,
+      whatYouWillLearn,
+    } = req.body;
 
     // Validate required fields
     if (!title || !description || !rating) {
@@ -46,6 +54,7 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
       img,
       category,
       sections,
+      whatYouWillLearn,
     });
 
     await newCourse.save();
