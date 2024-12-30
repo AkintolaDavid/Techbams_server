@@ -20,7 +20,7 @@ const sectionSchema = new mongoose.Schema({
 });
 
 const courseSchema = new mongoose.Schema({
-  title: { String, unique: true },
+  title: { type: String, unique: true },
   description: String,
   rating: Number,
   lecturer: String,
