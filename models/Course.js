@@ -28,6 +28,7 @@ const courseSchema = new mongoose.Schema({
   category: String,
   sections: [sectionSchema],
   whatYouWillLearn: [String],
+  dateCreated: { type: Date, default: Date.now }, // Add this field
 });
 
 const Course = mongoose.model("Course", courseSchema);
