@@ -38,6 +38,10 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
       sections,
       whatYouWillLearn,
     } = req.body;
+    const existingTitle = await Course.findOne({ title });
+    if (existingTitle) {
+      return res.status(400).json({ message: "Course Title already exists" });
+    }
 
     // Validate required fields
     if (!title || !description || !rating) {
