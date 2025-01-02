@@ -5,6 +5,7 @@ const authRoutes = require("./routes/auth");
 const courseRoutes = require("./routes/course");
 const contactRoutes = require("./routes/contact");
 const userRoutes = require("./routes/user");
+const enrollRoutes = require("./routes/enroll");
 const adminRoutes = require("./routes/adminRoutes");
 const cors = require("cors");
 // Load environment variables from .env
@@ -34,6 +35,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/enroll", enrollRoutes);
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
