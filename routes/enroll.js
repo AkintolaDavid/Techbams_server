@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const verifyUserToken = require("../middleware/verifyUserToken ");
+const verifyUserToken = require("../middleware/verifyUserToken");
 // Enroll in a course
 router.post("/", verifyUserToken, async (req, res) => {
   const { userId, courseId } = req.body;
