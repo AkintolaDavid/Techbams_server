@@ -38,17 +38,24 @@ router.post("/", verifyUserToken, async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
-router.get("/enrollments", authenticate, async (req, res) => {
-  const userId = req.user.id;
-
+router.get("/enrollments", async (req, res) => {
   try {
-    const enrollments = await Enrollment.find({ userId }).populate("courseId");
-    const enrolledCourses = enrollments.map(
-      (enrollment) => enrollment.courseId
-    );
+    const userId = req.user.id; // Assuming JWT or session middleware provides the authenticated user ID
+    const user = await User.findById(userId).populate("courses.courseId");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const enrolledCourses = user.courses.map((course) => ({
+      ...course.courseId.toObject(),
+      score: course.score,
+    }));
+
     res.json(enrolledCourses);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching enrollments", error });
+    console.error("Error fetching enrolled courses:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 module.exports = router;
