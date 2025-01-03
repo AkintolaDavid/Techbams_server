@@ -38,5 +38,17 @@ router.post("/", verifyUserToken, async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+router.get("/enrollments", authenticate, async (req, res) => {
+  const userId = req.user.id;
 
+  try {
+    const enrollments = await Enrollment.find({ userId }).populate("courseId");
+    const enrolledCourses = enrollments.map(
+      (enrollment) => enrollment.courseId
+    );
+    res.json(enrolledCourses);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching enrollments", error });
+  }
+});
 module.exports = router;
