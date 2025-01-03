@@ -24,13 +24,9 @@ router.post("/", verifyUserToken, async (req, res) => {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    // Check if the user is already enrolled in the course
-    const alreadyEnrolledInUser = user.courses.some(
-      (enrolledCourse) => enrolledCourse.courseId.toString() === courseId
-    );
     const alreadyEnrolledInCourse = course.enrolledUsers.includes(userId);
 
-    if (alreadyEnrolledInUser || alreadyEnrolledInCourse) {
+    if (alreadyEnrolledInCourse) {
       return res
         .status(400)
         .json({ message: "You are already enrolled in this course" });
