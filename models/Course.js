@@ -1,4 +1,3 @@
-// backend/models/Course.js
 const mongoose = require("mongoose");
 
 const timelineSchema = new mongoose.Schema({
@@ -28,7 +27,8 @@ const courseSchema = new mongoose.Schema({
   category: String,
   sections: [sectionSchema],
   whatYouWillLearn: [String],
-  dateCreated: { type: Date, default: Date.now }, // Add this field
+  dateCreated: { type: Date, default: Date.now },
+  enrolledUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Add this field
 });
 
 const Course = mongoose.model("Course", courseSchema);
