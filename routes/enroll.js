@@ -2,11 +2,15 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const verifyUserToken = require("../middleware/verifyUserToken");
+
 // Enroll in a course
 router.post("/", verifyUserToken, async (req, res) => {
-  const { userId, courseId } = req.body;
+  const { courseId } = req.body;
 
   try {
+    // `verifyUserToken` adds the `userId` to `req.user`
+    const userId = req.user.userId;
+
     const user = await User.findById(userId);
 
     if (!user) {
@@ -31,7 +35,7 @@ router.post("/", verifyUserToken, async (req, res) => {
     res.status(200).json({ message: "Successfully enrolled in the course" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
