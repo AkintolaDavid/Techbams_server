@@ -40,7 +40,7 @@ router.post("/", verifyUserToken, async (req, res) => {
 });
 router.get("/enrollments", verifyUserToken, async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming JWT or session middleware provides the authenticated user ID
+    const userId = req.user.userId; // Assuming JWT or session middleware provides the authenticated user ID
     console.log(userId);
     console.log("userId");
     const user = await User.findById(userId).populate("courses.courseId");
