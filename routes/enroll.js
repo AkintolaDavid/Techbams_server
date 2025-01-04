@@ -42,8 +42,8 @@ router.post("/", verifyUserToken, async (req, res) => {
     // Add user to course's enrolledUsers
     course.enrolledUsers.push({
       userId: userId,
-      userName: user.name, // Assuming the user's name is stored in `name` field
-      userEmail: user.email, // Assuming the user's email is stored in `email` field
+      userName: useremail, // Assuming the user's name is stored in `name` field
+      userEmail: userfullName, // Assuming the user's email is stored in `email` field
     });
     await course.save();
 
