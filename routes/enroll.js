@@ -65,7 +65,7 @@ router.post("/unenroll", verifyUserToken, async (req, res) => {
 
     // Check if the user is enrolled in the course
     const isEnrolledInCourse = course.enrolledUsers.some(
-      (user) => user.userId.toString() === userId
+      (user) => user.userId === userId
     );
 
     if (!isEnrolledInCourse) {
@@ -76,7 +76,7 @@ router.post("/unenroll", verifyUserToken, async (req, res) => {
 
     // Remove user from course's enrolledUsers
     course.enrolledUsers = course.enrolledUsers.filter(
-      (user) => user.userId.toString() !== userId
+      (user) => user.userId !== userId
     );
 
     // Save updated course
