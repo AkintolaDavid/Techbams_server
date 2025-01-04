@@ -12,7 +12,7 @@ router.post("/", verifyUserToken, async (req, res) => {
     const userId = req.user.userId;
     const userEmail = req.user.email;
     const userFullName = req.user.fullName;
-
+    console.log(userId, userEmail, userFullName);
     // Validate course existence
     const course = await Course.findById(courseId);
     if (!course) {
@@ -32,11 +32,11 @@ router.post("/", verifyUserToken, async (req, res) => {
         enrolledUser.userId && enrolledUser.userId.toString() === userId
     );
 
-    if (alreadyEnrolledInCourse) {
-      return res
-        .status(400)
-        .json({ message: "You are already enrolled in this course" });
-    }
+    // if (alreadyEnrolledInCourse) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "You are already enrolled in this course" });
+    // }
 
     // Add user to course's enrolledUsers array
     course.enrolledUsers.push({
