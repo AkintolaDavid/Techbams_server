@@ -4,16 +4,14 @@ const User = require("../models/User"); // Assuming you have a User model
 const Course = require("../models/Course"); // Assuming you have a Course model
 const verifyUserToken = require("../middleware/verifyUserToken"); // Middleware to verify the token
 
-// Enroll in a course
-// Enroll in a course
 router.post("/", verifyUserToken, async (req, res) => {
   const { courseId } = req.body;
 
   try {
-    // Get userId from the token
+    // Extract user details from the token
     const userId = req.user.userId;
-    const useremail = req.user.email;
-    const userfullName = req.user.fullName;
+    const userEmail = req.user.email;
+    const userFullName = req.user.fullName;
 
     // Validate course existence
     const course = await Course.findById(courseId);
@@ -30,7 +28,8 @@ router.post("/", verifyUserToken, async (req, res) => {
     // Ensure enrolledUsers is an array and check if the user is already enrolled
     const enrolledUsers = course.enrolledUsers || [];
     const alreadyEnrolledInCourse = enrolledUsers.some(
-      (user) => user.userId && user.userId.toString() === userId
+      (enrolledUser) =>
+        enrolledUser.userId && enrolledUser.userId.toString() === userId
     );
 
     if (alreadyEnrolledInCourse) {
@@ -39,12 +38,14 @@ router.post("/", verifyUserToken, async (req, res) => {
         .json({ message: "You are already enrolled in this course" });
     }
 
-    // Add user to course's enrolledUsers
+    // Add user to course's enrolledUsers array
     course.enrolledUsers.push({
-      userId: userId,
-      userName: useremail, // Assuming the user's name is stored in `name` field
-      userEmail: userfullName, // Assuming the user's email is stored in `email` field
+      userId,
+      userName: userFullName, // Correct mapping for user's full name
+      userEmail, // Correct mapping for user's email
     });
+
+    // Save the updated course document
     await course.save();
 
     res.status(200).json({ message: "Successfully enrolled in the course" });
