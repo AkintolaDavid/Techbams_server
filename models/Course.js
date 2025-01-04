@@ -28,7 +28,13 @@ const courseSchema = new mongoose.Schema({
   sections: [sectionSchema],
   whatYouWillLearn: [String],
   dateCreated: { type: Date, default: Date.now },
-  enrolledUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Add this field
+  enrolledUsers: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      fullName: String,
+      email: String,
+    },
+  ],
 });
 
 const Course = mongoose.model("Course", courseSchema);
