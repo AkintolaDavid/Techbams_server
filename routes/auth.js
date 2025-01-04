@@ -74,9 +74,18 @@ router.post("/verify-otp", async (req, res) => {
     }
 
     // OTP is valid, generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        fullName: user.fullName,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "4h",
+      }
+    );
 
     // Mark the user as verified and clear OTP data
     user.isVerified = true;
@@ -114,10 +123,14 @@ router.post("/login", async (req, res) => {
         message: "Account not verified. Use forget passward to verify",
       });
     }
-
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, role: "user" },
+      {
+        userId: user._id,
+        role: "user",
+        email: user.email,
+        fullName: user.fullName,
+      },
       process.env.JWT_SECRET,
       {
         expiresIn: "10h",
@@ -210,9 +223,18 @@ router.post("/verifyOtp", async (req, res) => {
     }
 
     // OTP is valid; generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token validity
-    });
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        fullName: user.fullName,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "4h",
+      }
+    );
 
     // Update user: mark as verified and clear OTP fields
     user.isVerified = true;

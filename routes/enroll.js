@@ -12,6 +12,8 @@ router.post("/", verifyUserToken, async (req, res) => {
   try {
     // Get userId from the token
     const userId = req.user.userId;
+    const useremail = req.user.email;
+    const userfullName = req.user.fullName;
 
     // Validate course existence
     const course = await Course.findById(courseId);
