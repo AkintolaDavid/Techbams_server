@@ -31,20 +31,11 @@ router.post("/", verifyUserToken, async (req, res) => {
       (enrolledUser) =>
         enrolledUser.userId && enrolledUser.userId.toString() === userId
     );
-
-    // if (alreadyEnrolledInCourse) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "You are already enrolled in this course" });
-    // }
-
-    // Add user to course's enrolledUsers array
     course.enrolledUsers.push({
       userId,
-      userName: userFullName, // Correct mapping for user's full name
-      userEmail, // Correct mapping for user's email
+      fullName: userFullName, // Correct mapping for user's full name
+      email: userEmail, // Correct mapping for user's email
     });
-
     // Save the updated course document
     await course.save();
 
