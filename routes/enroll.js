@@ -5,6 +5,7 @@ const Course = require("../models/Course"); // Assuming you have a Course model
 const verifyUserToken = require("../middleware/verifyUserToken"); // Middleware to verify the token
 
 // Enroll in a course
+// Enroll in a course
 router.post("/", verifyUserToken, async (req, res) => {
   const { courseId } = req.body;
 
@@ -24,8 +25,10 @@ router.post("/", verifyUserToken, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const alreadyEnrolledInCourse = course.enrolledUsers.some(
-      (user) => user.userId.toString() === userId
+    // Ensure enrolledUsers is an array and check if the user is already enrolled
+    const enrolledUsers = course.enrolledUsers || [];
+    const alreadyEnrolledInCourse = enrolledUsers.some(
+      (user) => user.userId && user.userId.toString() === userId
     );
 
     if (alreadyEnrolledInCourse) {
@@ -63,9 +66,10 @@ router.post("/unenroll", verifyUserToken, async (req, res) => {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    // Check if the user is enrolled in the course
-    const isEnrolledInCourse = course.enrolledUsers.some(
-      (user) => user.userId === userId
+    // Ensure enrolledUsers is an array and check if the user is enrolled
+    const enrolledUsers = course.enrolledUsers || [];
+    const isEnrolledInCourse = enrolledUsers.some(
+      (user) => user.userId && user.userId.toString() === userId
     );
 
     if (!isEnrolledInCourse) {
@@ -76,7 +80,7 @@ router.post("/unenroll", verifyUserToken, async (req, res) => {
 
     // Remove user from course's enrolledUsers
     course.enrolledUsers = course.enrolledUsers.filter(
-      (user) => user.userId !== userId
+      (user) => user.userId && user.userId.toString() !== userId
     );
 
     // Save updated course
