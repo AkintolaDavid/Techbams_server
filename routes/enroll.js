@@ -56,7 +56,11 @@ router.post("/", verifyUserToken, async (req, res) => {
     }
 
     // Validate course existence
-    const course = await Course.findById(courseId);
+    const course = await Course.findById(courseId).populate(
+      "enrolledUsers", // Path to populate
+      "fullName email" // Fields to retrieve
+    );
+
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
