@@ -132,19 +132,19 @@ router.get("/:id", verifyTokenForAdminOrUser, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 router.delete("/:model/:id", verifyAdminToken, async (req, res) => {
   const { model, id } = req.params;
   const Model = model === "course" ? Course : Blog;
 
   try {
     const deletedItem = await Model.findByIdAndDelete(id);
-    if (!deletedItem) return res.status(404).json({ message: ${model} not found });
+    if (!deletedItem)
+      return res.status(404).json({ message: `${model} not found` });
 
-    res.status(200).json({ message: ${model} deleted successfully! });
+    res.status(200).json({ message: `${model} deleted successfully!` });
   } catch (error) {
-    console.error(Error deleting ${model}:, error);
-    res.status(500).json({ error: Error deleting ${model} });
+    console.error(`Error deleting ${model}:`, error);
+    res.status(500).json({ error: `Error deleting ${model}` });
   }
 });
 router.put("/course/:id/learn", async (req, res) => {
