@@ -111,6 +111,14 @@ router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
     res.status(500).json({ message: "Error fetching courses" });
   }
 });
+router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
+  try {
+    const blog = await Blog.find(); // Fetch blog from MongoDB
+    res.json(blog);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching blog" });
+  }
+});
 
 router.get("/:id", verifyTokenForAdminOrUser, async (req, res) => {
   try {
