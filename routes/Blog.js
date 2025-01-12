@@ -63,3 +63,4 @@ router.delete("/:id", verifyAdminToken, async (req, res) => {
     res.status(500).json({ error: "Error deleting Blog" });
   }
 });
+module.exports = router;
