@@ -1,7 +1,8 @@
 // backend/routes/courses.js
 const express = require("express");
 const router = express.Router();
-const Course = require("../models/Course"); // Import your Course model
+const Course = require("../models/Course");
+const Blog = require("../models/Blog");
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
@@ -72,7 +73,36 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
       .json({ message: "Error adding course. Please try again later." });
   }
 });
+router.post("/addBlog", verifyAdminToken, async (req, res) => {
+  try {
+    const { title, description, img } = req.body;
+    const existingTitle = await Blog.findOne({ title });
+    if (existingTitle) {
+      return res.status(400).json({ message: "Blog Title already exists" });
+    }
 
+    // Validate required fields
+    if (!title || !description || !img) {
+      return res
+        .status(400)
+        .json({ message: "Title, description, and image are required." });
+    }
+
+    const newBlog = new Blog({
+      title,
+      description,
+      img,
+    });
+
+    await newBlog.save();
+    res.status(201).json({ message: "Blog added successfully", blog: newBlog });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Error adding blog. Please try again later." });
+  }
+});
 router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
   try {
     const courses = await Course.find(); // Fetch courses from MongoDB
