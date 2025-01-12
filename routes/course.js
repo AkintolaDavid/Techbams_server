@@ -85,7 +85,7 @@ router.delete("/:id", verifyAdminToken, async (req, res) => {
   const { id } = req.params; // Use 'id' as the parameter in the route
   try {
     // Find and delete the course by its ID
-    const deletedBlog = await Course.findByIdAndDelete(id);
+    const deletedCourse = await Course.findByIdAndDelete(id);
 
     // If no Course is found, return a 404 error
     if (!deletedCourse) {
