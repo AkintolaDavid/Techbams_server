@@ -1,3 +1,10 @@
+// backend/routes/courses.js
+const express = require("express");
+const router = express.Router();
+const Course = require("../models/Course");
+const Blog = require("../models/Blog");
+const verifyAdminToken = require("../middleware/verifyAdminToken ");
+const verifyTokenForAdminOrUser = require("../middleware/verifyTokenForAdminOrUser");
 router.post("/", verifyAdminToken, async (req, res) => {
   try {
     const { title, description, img } = req.body;
@@ -28,12 +35,13 @@ router.post("/", verifyAdminToken, async (req, res) => {
       .json({ message: "Error adding blog. Please try again later." });
   }
 });
+
 router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
   try {
-    const courses = await Course.find(); // Fetch courses from MongoDB
-    res.json(courses);
+    const blog = await Blog.find(); // Fetch blog from MongoDB
+    res.json(blog);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching courses" });
+    res.status(500).json({ message: "Error fetching blog" });
   }
 });
 router.delete("/:id", verifyAdminToken, async (req, res) => {

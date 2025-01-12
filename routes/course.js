@@ -73,13 +73,12 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
       .json({ message: "Error adding course. Please try again later." });
   }
 });
-
 router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
   try {
-    const blog = await Blog.find(); // Fetch blog from MongoDB
-    res.json(blog);
+    const courses = await Course.find(); // Fetch courses from MongoDB
+    res.json(courses);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching blog" });
+    res.status(500).json({ message: "Error fetching courses" });
   }
 });
 router.delete("/:id", verifyAdminToken, async (req, res) => {
