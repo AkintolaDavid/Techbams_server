@@ -119,7 +119,25 @@ router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
     res.status(500).json({ message: "Error fetching blog" });
   }
 });
+router.delete("/:id", verifyAdminToken, async (req, res) => {
+  const { id } = req.params; // Use 'id' as the parameter in the route
+  try {
+    // Find and delete the course by its ID
+    const deletedBlog = await Blog.findByIdAndDelete(id);
 
+    // If no Blog is found, return a 404 error
+    if (!deletedBlog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    // Return a success message if the Blog was deleted
+    res.status(200).json({ message: "Blog deleted successfully!" });
+  } catch (error) {
+    console.error("Error deleting Blog:", error);
+    // Return a 500 error if something goes wrong on the server
+    res.status(500).json({ error: "Error deleting Blog" });
+  }
+});
 router.get("/:id", verifyTokenForAdminOrUser, async (req, res) => {
   try {
     const courseId = req.params.id;
