@@ -35,6 +35,19 @@ router.post("/", verifyAdminToken, async (req, res) => {
       .json({ message: "Error adding blog. Please try again later." });
   }
 });
+router.get("/:id", async (req, res) => {
+  try {
+    const blogId = req.params.id;
+    const blog = await Blog.findById(blogId); // Assuming your blog data is in the "blog" model
+    if (!blog) {
+      return res.status(404).json({ message: "blog not found" });
+    }
+    res.json(blog);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 router.get("/", async (req, res) => {
   try {
