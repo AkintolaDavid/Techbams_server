@@ -36,7 +36,7 @@ router.post("/", verifyAdminToken, async (req, res) => {
   }
 });
 
-router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const blog = await Blog.find(); // Fetch blog from MongoDB
     res.json(blog);
