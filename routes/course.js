@@ -119,25 +119,6 @@ router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
     res.status(500).json({ message: "Error fetching blog" });
   }
 });
-router.delete("/:id", verifyAdminToken, async (req, res) => {
-  const { id } = req.params; // Use 'id' as the parameter in the route
-  try {
-    // Find and delete the course by its ID
-    const deletedBlog = await Blog.findByIdAndDelete(id);
-
-    // If no Blog is found, return a 404 error
-    if (!deletedBlog) {
-      return res.status(404).json({ message: "Blog not found" });
-    }
-
-    // Return a success message if the Blog was deleted
-    res.status(200).json({ message: "Blog deleted successfully!" });
-  } catch (error) {
-    console.error("Error deleting Blog:", error);
-    // Return a 500 error if something goes wrong on the server
-    res.status(500).json({ error: "Error deleting Blog" });
-  }
-});
 router.get("/:id", verifyTokenForAdminOrUser, async (req, res) => {
   try {
     const courseId = req.params.id;
@@ -152,24 +133,18 @@ router.get("/:id", verifyTokenForAdminOrUser, async (req, res) => {
   }
 });
 
-// Delete a course by ID
-router.delete("/:id", verifyAdminToken, async (req, res) => {
-  const { id } = req.params; // Use 'id' as the parameter in the route
+router.delete("/:model/:id", verifyAdminToken, async (req, res) => {
+  const { model, id } = req.params;
+  const Model = model === "course" ? Course : Blog;
+
   try {
-    // Find and delete the course by its ID
-    const deletedCourse = await Course.findByIdAndDelete(id);
+    const deletedItem = await Model.findByIdAndDelete(id);
+    if (!deletedItem) return res.status(404).json({ message: ${model} not found });
 
-    // If no course is found, return a 404 error
-    if (!deletedCourse) {
-      return res.status(404).json({ message: "Course not found" });
-    }
-
-    // Return a success message if the course was deleted
-    res.status(200).json({ message: "Course deleted successfully!" });
+    res.status(200).json({ message: ${model} deleted successfully! });
   } catch (error) {
-    console.error("Error deleting course:", error);
-    // Return a 500 error if something goes wrong on the server
-    res.status(500).json({ error: "Error deleting course" });
+    console.error(Error deleting ${model}:, error);
+    res.status(500).json({ error: Error deleting ${model} });
   }
 });
 router.put("/course/:id/learn", async (req, res) => {
