@@ -25,8 +25,6 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname)); // Set file name with timestamp to avoid duplicates
   },
 });
-
-// POST route to save a course
 router.post("/addCourse", verifyAdminToken, async (req, res) => {
   try {
     const {
@@ -36,19 +34,49 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
       lecturer,
       img,
       category,
-      sections,
+      sections, // Array of sections with quizzes
       whatYouWillLearn,
     } = req.body;
+
     const existingTitle = await Course.findOne({ title });
     if (existingTitle) {
       return res.status(400).json({ message: "Course Title already exists" });
     }
 
     // Validate required fields
-    if (!title || !description || !rating) {
+    if (!title || !description || !rating || !sections) {
       return res
         .status(400)
-        .json({ message: "Title, description, and rating are required." });
+        .json({
+          message: "Title, description, rating, and sections are required.",
+        });
+    }
+
+    // Ensure each section contains necessary quiz data
+    for (const section of sections) {
+      if (section.quiz) {
+        const { questions } = section.quiz;
+        if (!Array.isArray(questions) || questions.length === 0) {
+          return res.status(400).json({
+            message: "Each quiz must have at least one question.",
+          });
+        }
+
+        questions.forEach((question, index) => {
+          if (
+            !question.text ||
+            !Array.isArray(question.options) ||
+            question.options.length < 2 ||
+            typeof question.correctAnswerIndex !== "number"
+          ) {
+            throw new Error(
+              `Question ${index + 1} in section "${
+                section.title
+              }" is missing required fields.`
+            );
+          }
+        });
+      }
     }
 
     const newCourse = new Course({
@@ -67,12 +95,13 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
       .status(201)
       .json({ message: "Course added successfully", course: newCourse });
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     res
       .status(500)
       .json({ message: "Error adding course. Please try again later." });
   }
 });
+
 router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
   try {
     const courses = await Course.find(); // Fetch courses from MongoDB
@@ -163,29 +192,56 @@ router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
   const { userId, answers } = req.body;
 
   try {
+    // Step 1: Fetch the course and section
     const course = await Course.findById(courseId);
     const section = course.sections.id(sectionId);
+
+    if (!section || !section.quiz) {
+      return res.status(404).json({ error: "Section or quiz not found." });
+    }
+
     const { questions } = section.quiz;
 
+    // Step 2: Calculate the user's score
     let score = 0;
-
     questions.forEach((question, index) => {
       if (answers[index] === question.correctAnswerIndex) {
         score++;
       }
     });
 
-    // Update user's progress in the enrolledUsers array
-    const user = course.enrolledUsers.find(
+    // Step 3: Update user's score in the course
+    const enrolledUser = course.enrolledUsers.find(
       (user) => user.userId.toString() === userId
     );
-    if (user) {
-      user.score = score; // Save user score for the quiz
+    if (enrolledUser) {
+      enrolledUser.score = score; // Save score in the course
     }
 
+    // Step 4: Update user's progress in the User collection
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const courseProgress = user.courses.find(
+      (c) => c.courseId.toString() === courseId
+    );
+    if (courseProgress) {
+      courseProgress.score = score; // Update score for the course
+    } else {
+      // If the course isn't already in the user's progress, add it
+      user.courses.push({ courseId, score });
+    }
+
+    // Save both the course and the user updates
     await course.save();
+    await user.save();
+
+    // Respond with the calculated score
     res.status(200).json({ score });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to submit quiz." });
   }
 });
