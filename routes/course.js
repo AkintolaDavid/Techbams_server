@@ -129,4 +129,65 @@ router.put("/course/:id/learn", async (req, res) => {
     res.status(500).json({ message: "Failed to update", error });
   }
 });
+// Add Quiz to Section
+router.post("/:courseId/section/:sectionId/quiz", async (req, res) => {
+  const { courseId, sectionId } = req.params;
+  const { title, questions } = req.body;
+
+  try {
+    const course = await Course.findById(courseId);
+    const section = course.sections.id(sectionId);
+    section.quiz = { title, questions };
+
+    await course.save();
+    res.status(200).json({ message: "Quiz added successfully!" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add quiz." });
+  }
+});
+router.get("/:courseId/section/:sectionId/quiz", async (req, res) => {
+  const { courseId, sectionId } = req.params;
+
+  try {
+    const course = await Course.findById(courseId).select(`sections._id quiz`);
+    const section = course.sections.id(sectionId);
+
+    res.status(200).json(section.quiz);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve quiz." });
+  }
+});
+
+router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
+  const { courseId, sectionId } = req.params;
+  const { userId, answers } = req.body;
+
+  try {
+    const course = await Course.findById(courseId);
+    const section = course.sections.id(sectionId);
+    const { questions } = section.quiz;
+
+    let score = 0;
+
+    questions.forEach((question, index) => {
+      if (answers[index] === question.correctAnswerIndex) {
+        score++;
+      }
+    });
+
+    // Update user's progress in the enrolledUsers array
+    const user = course.enrolledUsers.find(
+      (user) => user.userId.toString() === userId
+    );
+    if (user) {
+      user.score = score; // Save user score for the quiz
+    }
+
+    await course.save();
+    res.status(200).json({ score });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to submit quiz." });
+  }
+});
+
 module.exports = router;
