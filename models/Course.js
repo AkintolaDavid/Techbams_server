@@ -6,7 +6,6 @@ const questionSchema = new mongoose.Schema({
 });
 
 const quizSchema = new mongoose.Schema({
-  title: String, // Quiz title
   questions: [questionSchema],
 });
 const timelineSchema = new mongoose.Schema({
