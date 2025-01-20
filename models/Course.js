@@ -1,5 +1,14 @@
 const mongoose = require("mongoose");
+const questionSchema = new mongoose.Schema({
+  questionText: String,
+  options: [String], // Multiple choices
+  correctAnswerIndex: Number, // Index of the correct option
+});
 
+const quizSchema = new mongoose.Schema({
+  title: String, // Quiz title
+  questions: [questionSchema],
+});
 const timelineSchema = new mongoose.Schema({
   time: String,
   note: String,
@@ -16,6 +25,7 @@ const sectionSchema = new mongoose.Schema({
   videoUrl: String,
   timeline: [timelineSchema],
   resources: [resourceSchema],
+  quiz: quizSchema,
 });
 
 const courseSchema = new mongoose.Schema({
