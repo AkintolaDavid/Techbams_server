@@ -45,11 +45,9 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
 
     // Validate required fields
     if (!title || !description || !rating || !sections) {
-      return res
-        .status(400)
-        .json({
-          message: "Title, description, rating, and sections are required.",
-        });
+      return res.status(400).json({
+        message: "Title, description, rating, and sections are required.",
+      });
     }
 
     // Ensure each section contains necessary quiz data
@@ -63,16 +61,35 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
         }
 
         questions.forEach((question, index) => {
+          if (!section || !section.title) {
+            throw new Error(`Section is missing a title.`);
+          }
+
+          if (!question.text?.trim()) {
+            throw new Error(
+              `Question ${index + 1} in section "${
+                section.title
+              }" is missing text.`
+            );
+          }
+
+          if (!Array.isArray(question.options) || question.options.length < 2) {
+            throw new Error(
+              `Question ${index + 1} in section "${
+                section.title
+              }" must have at least two options.`
+            );
+          }
+
           if (
-            !question.text ||
-            !Array.isArray(question.options) ||
-            question.options.length < 2 ||
-            typeof question.correctAnswerIndex !== "number"
+            typeof question.correctAnswerIndex !== "number" ||
+            question.correctAnswerIndex < 0 ||
+            question.correctAnswerIndex >= question.options.length
           ) {
             throw new Error(
               `Question ${index + 1} in section "${
                 section.title
-              }" is missing required fields.`
+              }" has an invalid correctAnswerIndex.`
             );
           }
         });
