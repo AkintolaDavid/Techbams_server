@@ -38,36 +38,43 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
       whatYouWillLearn,
     } = req.body;
 
+    // Log the incoming data for debugging
+    console.log("Incoming Course Data:", JSON.stringify(req.body, null, 2));
+
+    // Check for duplicate title
     const existingTitle = await Course.findOne({ title });
     if (existingTitle) {
       return res.status(400).json({ message: "Course Title already exists" });
     }
 
-    // Validate required fields
-    if (!title || !description || !rating || !sections) {
+    // Validate required course fields
+    if (!title || !description || !rating || !Array.isArray(sections)) {
       return res.status(400).json({
         message: "Title, description, rating, and sections are required.",
       });
     }
 
-    // Ensure each section contains necessary quiz data
-    for (const section of sections) {
+    // Validate sections and quizzes
+    for (const [sectionIndex, section] of sections.entries()) {
+      // Optional: Skip title validation if not needed
+      if (!section.title?.trim()) {
+        return res.status(400).json({
+          message: `Section ${sectionIndex + 1} is missing a title.`,
+        });
+      }
+
       if (section.quiz) {
         const { questions } = section.quiz;
         if (!Array.isArray(questions) || questions.length === 0) {
           return res.status(400).json({
-            message: "Each quiz must have at least one question.",
+            message: `Quiz in section "${section.title}" must have at least one question.`,
           });
         }
 
-        questions.forEach((question, index) => {
-          if (!section || !section.title) {
-            throw new Error(`Section is missing a title.`);
-          }
-
+        questions.forEach((question, questionIndex) => {
           if (!question.text?.trim()) {
             throw new Error(
-              `Question ${index + 1} in section "${
+              `Question ${questionIndex + 1} in section "${
                 section.title
               }" is missing text.`
             );
@@ -75,7 +82,7 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
 
           if (!Array.isArray(question.options) || question.options.length < 2) {
             throw new Error(
-              `Question ${index + 1} in section "${
+              `Question ${questionIndex + 1} in section "${
                 section.title
               }" must have at least two options.`
             );
@@ -87,7 +94,7 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
             question.correctAnswerIndex >= question.options.length
           ) {
             throw new Error(
-              `Question ${index + 1} in section "${
+              `Question ${questionIndex + 1} in section "${
                 section.title
               }" has an invalid correctAnswerIndex.`
             );
@@ -96,6 +103,7 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
       }
     }
 
+    // Save the course
     const newCourse = new Course({
       title,
       description,
@@ -108,14 +116,16 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
     });
 
     await newCourse.save();
+
     res
       .status(201)
       .json({ message: "Course added successfully", course: newCourse });
   } catch (error) {
-    console.error(error.message);
-    res
-      .status(500)
-      .json({ message: "Error adding course. Please try again later." });
+    console.error(error.message); // Log the error for debugging
+    res.status(500).json({
+      message: "Error adding course. Please try again later.",
+      error: error.message,
+    });
   }
 });
 
