@@ -72,7 +72,7 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
         }
 
         questions.forEach((question, questionIndex) => {
-          if (!question.text?.trim()) {
+          if (!question.questionText?.trim()) {
             throw new Error(
               `Question ${questionIndex + 1} in section "${
                 section.title
