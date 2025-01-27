@@ -38,9 +38,6 @@ router.post("/addCourse", verifyAdminToken, async (req, res) => {
       whatYouWillLearn,
     } = req.body;
 
-    // Log the incoming data for debugging
-    console.log("Incoming Course Data:", JSON.stringify(req.body, null, 2));
-
     // Check for duplicate title
     const existingTitle = await Course.findOne({ title });
     if (existingTitle) {
@@ -202,6 +199,7 @@ router.post("/:courseId/section/:sectionId/quiz", async (req, res) => {
   }
 });
 router.get("/:courseId/section/:sectionId/quiz", async (req, res) => {
+  console.log("Route accessed");
   const { courseId, sectionId } = req.params;
   console.log(courseId, sectionId);
   try {
