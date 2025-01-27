@@ -203,11 +203,20 @@ router.get("/:courseId/section/:sectionId/quiz", async (req, res) => {
   const { courseId, sectionId } = req.params;
   console.log(courseId, sectionId);
   try {
-    const course = await Course.findById(courseId).select(`sections._id quiz`);
-    console.log(course);
-    const section = course.sections.id(sectionId);
-    console.log(section);
-    res.status(200).json(section.quiz);
+    const course = await Course.findById(courseId).select("sections"); // Fetch all sections
+    console.log(course); // Verify the structure of the fetched data
+
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    const section = course.sections.id(sectionId); // Get the specific section
+    if (!section) {
+      return res.status(404).json({ error: "Section not found" });
+    }
+
+    console.log(section); // Check the retrieved section
+    res.status(200).json(section.quiz); // Return the quiz object
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve quiz." });
   }
