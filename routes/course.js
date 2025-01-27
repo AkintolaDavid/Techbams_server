@@ -203,11 +203,12 @@ router.post("/:courseId/section/:sectionId/quiz", async (req, res) => {
 });
 router.get("/:courseId/section/:sectionId/quiz", async (req, res) => {
   const { courseId, sectionId } = req.params;
-
+  console.log(courseId, sectionId);
   try {
     const course = await Course.findById(courseId).select(`sections._id quiz`);
+    console.log(course);
     const section = course.sections.id(sectionId);
-
+    console.log(section);
     res.status(200).json(section.quiz);
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve quiz." });
