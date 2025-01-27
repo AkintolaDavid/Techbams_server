@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const Course = require("../models/Course");
-const Blog = require("../models/Blog");
+const User = require("../models/User");
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
@@ -225,7 +225,7 @@ router.get("/:courseId/section/:sectionId/quiz", async (req, res) => {
 router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
   const { courseId, sectionId } = req.params;
   const { userId, answers } = req.body;
-
+  console.log(userId, answers);
   try {
     // Step 1: Fetch the course and section
     const course = await Course.findById(courseId);
