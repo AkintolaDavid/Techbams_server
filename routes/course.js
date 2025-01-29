@@ -286,4 +286,49 @@ router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
     res.status(500).json({ error: "Failed to submit quiz." });
   }
 });
+router.get("/:courseId/section/:sectionId/quiz/attempts", async (req, res) => {
+  const { courseId, sectionId } = req.params;
+  const { userId } = req.query; // Assuming userId is passed as a query parameter
+
+  try {
+    // Fetch the course
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: "Course not found." });
+    }
+
+    // Find the section
+    const section = course.sections.id(sectionId);
+    if (!section || !section.quiz) {
+      return res.status(404).json({ error: "Section or quiz not found." });
+    }
+
+    // Find the enrolled user in the course
+    const enrolledUser = course.enrolledUsers.find(
+      (user) => user.userId.toString() === userId
+    );
+
+    if (!enrolledUser) {
+      return res.status(404).json({ error: "User not enrolled in course." });
+    }
+
+    // Find the user's attempts left for this section's quiz
+    const sectionProgress = enrolledUser.sectionProgress?.find(
+      (s) => s.sectionId.toString() === sectionId
+    );
+
+    if (!sectionProgress) {
+      return res.status(200).json({ attemptsLeft: section.quiz.maxAttempts });
+    }
+
+    // Return attempts left
+    res.status(200).json({ attemptsLeft: sectionProgress.attemptsLeft });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch attempts left." });
+  }
+});
+
+module.exports = router;
+
 module.exports = router;
