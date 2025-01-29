@@ -312,16 +312,12 @@ router.get("/:courseId/section/:sectionId/quiz/attempts", async (req, res) => {
       return res.status(404).json({ error: "User not enrolled in course." });
     }
 
-    // Find the user's attempts left for this section's quiz
-    const sectionProgress = enrolledUser.sectionProgress?.find(
-      (s) => s.sectionId.toString() === sectionId
-    );
+    // Directly fetch the attempts from the enrolled user
+    let attemptsLeft = enrolledUser.attempts;
 
-    let attemptsLeft;
-    if (!sectionProgress) {
-      attemptsLeft = section.quiz.maxAttempts; // Default max attempts
-    } else {
-      attemptsLeft = sectionProgress.attemptsLeft; // User's remaining attempts
+    // If you want to respect a `maxAttempts` property, you can compare it:
+    if (attemptsLeft < 0) {
+      attemptsLeft = 0; // Ensure attempts don't go below 0
     }
 
     // Log attempts left to confirm it's correct
@@ -336,5 +332,3 @@ router.get("/:courseId/section/:sectionId/quiz/attempts", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch attempts left." });
   }
 });
-
-module.exports = router;
