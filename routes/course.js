@@ -289,7 +289,7 @@ router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
 router.get("/:courseId/section/:sectionId/quiz/attempts", async (req, res) => {
   const { courseId, sectionId } = req.params;
   const { userId } = req.query; // Assuming userId is passed as a query parameter
-
+  console.log(courseId, sectionId, userId);
   try {
     // Fetch the course
     const course = await Course.findById(courseId);
