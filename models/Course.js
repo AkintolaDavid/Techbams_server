@@ -42,6 +42,8 @@ const courseSchema = new mongoose.Schema({
       userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       fullName: String,
       email: String,
+      score: { type: Number, default: 0 },
+      attempts: { type: Number, default: 3 },
     },
   ],
 });

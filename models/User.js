@@ -18,6 +18,7 @@ const UserSchema = new mongoose.Schema(
           type: Number,
           default: 0, // Default score
         },
+        attempts: { type: Number, default: 3 },
       },
     ],
     otp: { type: String, required: false, default: null }, // Allow null

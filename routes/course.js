@@ -199,7 +199,6 @@ router.post("/:courseId/section/:sectionId/quiz", async (req, res) => {
   }
 });
 router.get("/:courseId/section/:sectionId/quiz", async (req, res) => {
-  console.log("Route accessed");
   const { courseId, sectionId } = req.params;
   console.log(courseId, sectionId);
   try {
@@ -225,7 +224,6 @@ router.get("/:courseId/section/:sectionId/quiz", async (req, res) => {
 router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
   const { courseId, sectionId } = req.params;
   const { userId, answers } = req.body;
-  console.log(userId, answers);
   try {
     // Step 1: Fetch the course and section
     const course = await Course.findById(courseId);
@@ -236,8 +234,20 @@ router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
     }
 
     const { questions } = section.quiz;
+    const enrolledUser = course.enrolledUsers.find(
+      (user) => user.userId.toString() === userId
+    );
 
-    // Step 2: Calculate the user's score
+    if (!enrolledUser) {
+      return res.status(404).json({ error: "User not enrolled in course." });
+    }
+
+    // Step 3: Check attempts left
+    if (enrolledUser.attempts <= 0) {
+      return res.status(403).json({ error: "No more attempts left." });
+    }
+
+    // Step 4: Calculate score
     let score = 0;
     questions.forEach((question, index) => {
       if (answers[index] === question.correctAnswerIndex) {
@@ -245,15 +255,11 @@ router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
       }
     });
 
-    // Step 3: Update user's score in the course
-    const enrolledUser = course.enrolledUsers.find(
-      (user) => user.userId.toString() === userId
-    );
-    if (enrolledUser) {
-      enrolledUser.score = score; // Save score in the course
-    }
+    // Step 5: Update score and reduce attempts
+    enrolledUser.score = Math.max(enrolledUser.score, score); // Keep highest score
+    enrolledUser.attempts -= 1; // Reduce attempts
 
-    // Step 4: Update user's progress in the User collection
+    // Step 6: Update User Progress
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found." });
@@ -262,23 +268,22 @@ router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
     const courseProgress = user.courses.find(
       (c) => c.courseId.toString() === courseId
     );
+
     if (courseProgress) {
-      courseProgress.score = score; // Update score for the course
+      courseProgress.score = Math.max(courseProgress.score, score);
+      courseProgress.attempts -= 1; // Reduce attempts
     } else {
-      // If the course isn't already in the user's progress, add it
-      user.courses.push({ courseId, score });
+      user.courses.push({ courseId, score, attempts: 2 }); // 2 attempts left after first try
     }
 
-    // Save both the course and the user updates
+    // Save both course and user
     await course.save();
     await user.save();
 
-    // Respond with the calculated score
-    res.status(200).json({ score });
+    res.status(200).json({ score, attemptsLeft: enrolledUser.attempts });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to submit quiz." });
   }
 });
-
 module.exports = router;
