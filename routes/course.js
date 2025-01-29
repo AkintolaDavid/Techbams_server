@@ -332,3 +332,4 @@ router.get("/:courseId/section/:sectionId/quiz/attempts", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch attempts left." });
   }
 });
+module.exports = router;
