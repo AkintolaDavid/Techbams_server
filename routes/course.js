@@ -317,18 +317,24 @@ router.get("/:courseId/section/:sectionId/quiz/attempts", async (req, res) => {
       (s) => s.sectionId.toString() === sectionId
     );
 
+    let attemptsLeft;
     if (!sectionProgress) {
-      return res.status(200).json({ attemptsLeft: section.quiz.maxAttempts });
+      attemptsLeft = section.quiz.maxAttempts; // Default max attempts
+    } else {
+      attemptsLeft = sectionProgress.attemptsLeft; // User's remaining attempts
     }
 
+    // Log attempts left to confirm it's correct
+    console.log(
+      `User ${userId} has ${attemptsLeft} attempts left for section ${sectionId}.`
+    );
+
     // Return attempts left
-    res.status(200).json({ attemptsLeft: sectionProgress.attemptsLeft });
+    res.status(200).json({ attemptsLeft });
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching attempts left:", error);
     res.status(500).json({ error: "Failed to fetch attempts left." });
   }
 });
-
-module.exports = router;
 
 module.exports = router;
