@@ -209,7 +209,7 @@ router.get("/:courseId/section/:sectionId/quiz", async (req, res) => {
       return res.status(404).json({ error: "Course not found" });
     }
 
-    const section = course.sections[sectionIndex];
+    const section = course.sections[sectionId];
     if (!section) {
       return res.status(404).json({ error: "Section not found" });
     }
