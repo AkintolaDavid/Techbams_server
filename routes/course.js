@@ -298,7 +298,7 @@ router.get("/:courseId/section/:sectionId/quiz/attempts", async (req, res) => {
     }
 
     // Find the section
-    const section = course.sections.id(sectionId);
+    const section = course.sections(sectionId);
     if (!section || !section.quiz) {
       return res.status(404).json({ error: "Section or quiz not found." });
     }
@@ -314,19 +314,15 @@ router.get("/:courseId/section/:sectionId/quiz/attempts", async (req, res) => {
 
     // Directly fetch the attempts from the enrolled user
     let attemptsLeft = enrolledUser.attempts;
+    let highestscore = enrolledUser.score;
 
     // If you want to respect a `maxAttempts` property, you can compare it:
     if (attemptsLeft < 0) {
       attemptsLeft = 0; // Ensure attempts don't go below 0
     }
 
-    // Log attempts left to confirm it's correct
-    console.log(
-      `User ${userId} has ${attemptsLeft} attempts left for section ${sectionId}.`
-    );
-
     // Return attempts left
-    res.status(200).json({ attemptsLeft });
+    res.status(200).json({ attemptsLeft, highestscore });
   } catch (error) {
     console.error("Error fetching attempts left:", error);
     res.status(500).json({ error: "Failed to fetch attempts left." });
