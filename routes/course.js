@@ -227,7 +227,7 @@ router.post("/:courseId/section/:sectionId/quiz/submit", async (req, res) => {
   try {
     // Step 1: Fetch the course and section
     const course = await Course.findById(courseId);
-    const section = course.sections.id(sectionId);
+    const section = course.sections[sectionId];
 
     if (!section || !section.quiz) {
       return res.status(404).json({ error: "Section or quiz not found." });
@@ -296,10 +296,7 @@ router.get("/:courseId/section/:sectionId/quiz/attempts", async (req, res) => {
     if (!course) {
       return res.status(404).json({ error: "Course not found." });
     }
-    {
-      console.log(sectionId);
-    }
-    // Find the section
+
     const section = course.sections[sectionId];
     if (!section || !section.quiz) {
       return res.status(404).json({ error: "Section or quiz not found." });
